@@ -1,7 +1,7 @@
 @layout('layouts.app')
 
 @section('content')
-<header class="masthead" style="background-image: url('/img/home-bg.jpg')">
+<header class="masthead">
     <div class="overlay"></div>
     <div class="container">
       <div class="row">
@@ -17,12 +17,19 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 offset-md-2">
+            @if(errors.length > 0)
+                <ul class="list-group mb-4">
+                    @each(error in errors)
+                        <li class="list-group-item text-danger">{{ error }}</li>
+                    @endeach
+                </ul>
+            @endif
             <form action="/users/login" method="POST" enctype="multipart/form-data">
                 
                 <div class="control-group">
                     <div class="form-group floating-label-form-group controls">
                         <label>Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="Email">
+                        <input type="email" name="email" value="{{ data.email || '' }}" class="form-control" placeholder="Email">
                     </div>
                 </div>
                 <div class="control-group">
@@ -36,6 +43,7 @@
                     <button class="btn btn-primary">
                         Login
                     </button>
+                    <p class="mt-3">New here? <a href="/auth/register">Create an account</a></p>
                 </div>
             </form>
         </div>

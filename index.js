@@ -9,17 +9,17 @@ const connectFlash = require('connect-flash');
 const edge = require('edge.js');
 const cloudinary = require('cloudinary').v2;
 
-const createPostController = require('./controllers/createPost');
+const createRecipeController = require('./controllers/createRecipe');
 const homePageController = require('./controllers/homePage');
-const storePostController = require('./controllers/storePost');
-const getPostController = require('./controllers/getPost');
+const storeRecipeController = require('./controllers/storeRecipe');
+const getRecipeController = require('./controllers/getRecipe');
 const createUser = require('./controllers/createUser');
 const storeUserController = require('./controllers/storeUser');
 const loginController = require('./controllers/login');
 const loginUserController = require('./controllers/loginUser');
 const logoutController = require('./controllers/logout');
 
-const storePost = require('./middleware/storePost');
+const validateRecipe = require('./middleware/validateRecipe');
 const auth = require('./middleware/auth');
 const redirectIfAuthenticated = require('./middleware/redirectIfAuthenticated');
 
@@ -32,7 +32,7 @@ const mongoConnection = mongoose.connect(DB_URI);
 
 app.use(fileUpload());
 
-// cloudinary is optional, without it images are stored in public/posts
+// cloudinary is optional, without it images are stored in public/recipes
 if (process.env.CLOUDINARY_NAME) {
     cloudinary.config({
         api_key: process.env.CLOUDINARY_API_KEY,
@@ -76,17 +76,17 @@ app.get('/auth/register',redirectIfAuthenticated, createUser);
 
 app.get('/auth/login',redirectIfAuthenticated, loginController);
 
-app.get('/auth/logout',auth, logoutController);
+app.get('/auth/logout', logoutController);
 
 app.post('/users/register',redirectIfAuthenticated, storeUserController);
 
 app.post('/users/login',redirectIfAuthenticated, loginUserController);
 
-app.get('/post/:id',getPostController);
+app.get('/recipes/new', auth, createRecipeController);
 
-app.get('/posts/new', auth, createPostController);
+app.post('/recipes',auth, validateRecipe, storeRecipeController);
 
-app.post('/posts/store',auth, storePost, storePostController);
+app.get('/recipes/:id',getRecipeController);
 app.use((req,res) => res.status(404).render('not-found'));
 
 app.listen(PORT,() => {

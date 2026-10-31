@@ -1,0 +1,63 @@
+@layout('layouts.app')
+
+@section('content')
+ <!-- Page Header -->
+<header class="masthead with-photo" style="background-image: url('{{ recipe.image }}')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>{{ recipe.title }}</h1>
+            <h2 class="subheading">{{ recipe.description }}</h2>
+            <span class="meta">Shared by {{ recipe.author.username }}
+              on {{ recipe.createdAt.toDateString() }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Recipe -->
+  <article class="recipe-body">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+
+          <div class="recipe-facts">
+            @if(recipe.prepTime > 0)
+            <div class="fact"><strong>{{ recipe.prepTime }} min</strong><span>Prep</span></div>
+            @endif
+            @if(recipe.cookTime > 0)
+            <div class="fact"><strong>{{ recipe.cookTime }} min</strong><span>Cook</span></div>
+            @endif
+            @if(recipe.totalTime > 0)
+            <div class="fact"><strong>{{ recipe.totalTime }} min</strong><span>Total</span></div>
+            @endif
+            @if(recipe.servings)
+            <div class="fact"><strong>{{ recipe.servings }}</strong><span>Servings</span></div>
+            @endif
+          </div>
+
+          <h2>Ingredients</h2>
+          <ul class="ingredients">
+            @each(ingredient in recipe.ingredients)
+            <li>{{ ingredient }}</li>
+            @endeach
+          </ul>
+
+          <h2>Method</h2>
+          <ol class="steps">
+            @each(step in recipe.steps)
+            <li>{{ step }}</li>
+            @endeach
+          </ol>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <hr>
+
+@endsection

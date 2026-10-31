@@ -1,13 +1,14 @@
 @layout('layouts.app')
 
 @section('content')
-<header class="masthead" style="background-image: url('/img/contact-bg.jpg')">
+<header class="masthead">
     <div class="overlay"></div>
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="page-heading">
-            <h1>New Post</h1>
+            <h1>Share a Recipe</h1>
+            <span class="subheading">What have you been cooking?</span>
           </div>
         </div>
       </div>
@@ -17,32 +18,61 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <form action="/posts/store" method="POST" enctype="multipart/form-data">
-                
+            @if(errors.length > 0)
+                <ul class="list-group mb-4">
+                    @each(error in errors)
+                        <li class="list-group-item text-danger">{{ error }}</li>
+                    @endeach
+                </ul>
+            @endif
+            <form class="recipe-form" action="/recipes" method="POST" enctype="multipart/form-data">
+
                 <div class="control-group">
                     <div class="form-group floating-label-form-group controls">
-                        <label>Title</label>
-                        <input type="text" name="title" class="form-control" placeholder="Title">
+                        <label>Recipe name</label>
+                        <input type="text" name="title" value="{{ data.title || '' }}" class="form-control" placeholder="Recipe name">
                     </div>
                 </div>
                 <div class="control-group">
                     <div class="form-group floating-label-form-group controls">
-                        <label>Subtitle</label>
-                        <input type="text" name="subtitle" class="form-control" placeholder="Subtitle">
+                        <label>Short description</label>
+                        <input type="text" name="description" value="{{ data.description || '' }}" class="form-control" placeholder="Short description, e.g. A quick weeknight curry">
                     </div>
                 </div>
-                <div class="control-group">
-                    <div class="form-group floating-label-form-group controls">
-                        <label>Content</label>
-                        <textarea cols="30" rows="10" class="form-control" placeholder="Content" id="content" name="content"></textarea>
+
+                <div class="form-row mt-4">
+                    <div class="form-group col-4">
+                        <label for="prepTime">Prep time (min)</label>
+                        <input type="number" min="0" id="prepTime" name="prepTime" value="{{ data.prepTime || '' }}" class="form-control">
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="cookTime">Cook time (min)</label>
+                        <input type="number" min="0" id="cookTime" name="cookTime" value="{{ data.cookTime || '' }}" class="form-control">
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="servings">Servings</label>
+                        <input type="number" min="1" id="servings" name="servings" value="{{ data.servings || '' }}" class="form-control">
                     </div>
                 </div>
-                <div class="form-group mt-5">
-                    <input type="file" name="image" class="form-control-file">
+
+                <div class="form-group mt-4">
+                    <label for="ingredients">Ingredients</label>
+                    <textarea rows="8" class="form-control" id="ingredients" name="ingredients" placeholder="2 cups flour&#10;1 tsp salt&#10;3 eggs">{{ data.ingredients || '' }}</textarea>
+                    <small class="form-hint">One ingredient per line</small>
+                </div>
+                <div class="form-group mt-4">
+                    <label for="steps">Method</label>
+                    <textarea rows="10" class="form-control" id="steps" name="steps" placeholder="Preheat the oven to 180°C&#10;Mix the dry ingredients&#10;...">{{ data.steps || '' }}</textarea>
+                    <small class="form-hint">One step per line, in order</small>
+                </div>
+
+                <div class="form-group mt-4">
+                    <label for="image">Photo of the dish</label>
+                    <input type="file" id="image" name="image" accept="image/*" class="form-control-file">
                 </div>
                 <div class="form-group my-4 text-center">
                     <button class="btn btn-primary">
-                        Create Post
+                        Publish Recipe
                     </button>
                 </div>
             </form>
@@ -50,16 +80,4 @@
     </div>
 </div>
 
-@endsection
-
-@section('styles')
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.css" rel="stylesheet">
-
-@endsection
-
-@section('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.12/summernote-bs4.js"></script>
-<script>
-    $('#content').summernote();
-</script>
 @endsection
