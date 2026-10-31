@@ -12,7 +12,7 @@ services:
         value: "24"
       - key: EXPRESS_SESSION_KEY
         generateValue: true
-      # set these in the Render dashboard, they are secrets
+      # set these in the Render dashboard, they are secrets used
       - key: DB_URI
         sync: false
       - key: CLOUDINARY_NAME
