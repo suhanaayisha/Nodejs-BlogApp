@@ -17,14 +17,10 @@ const UserSchema = new mongoose.Schema({
     }
     
 })
-UserSchema.pre('save', function(next){
-    const user = this;
+UserSchema.pre('save', async function(){
+    if (!this.isModified('password')) return;
 
-    bcrypt.hash(user.password, 10, function(error, encrypted){
-        user.password = encrypted
-
-        next()
-    })
+    this.password = await bcrypt.hash(this.password, 10)
 })
 const User = mongoose.model('User', UserSchema)
 

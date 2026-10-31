@@ -1,15 +1,13 @@
-require('dotenv').config();
-console.log(process.env.DB_URI);
+require('dotenv').config({ quiet: true });
 const express = require('express');
 const { config, engine } = require('express-edge'); //for templating
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser') ;// to collect data from browser
 const fileUpload = require('express-fileupload');
 const expressSession = require('express-session');
-const connectMongo = require('connect-mongo');
+const { MongoStore } = require('connect-mongo');
 const connectFlash = require('connect-flash');
 const edge = require('edge.js');
-const cloudinary = require('cloudinary');
+const cloudinary = require('cloudinary').v2;
 
 const createPostController = require('./controllers/createPost');
 const homePageController = require('./controllers/homePage');
@@ -27,42 +25,46 @@ const redirectIfAuthenticated = require('./middleware/redirectIfAuthenticated');
 
 const app = new express()
 
-mongoose.connect(process.env.DB_URI);
+const DB_URI = process.env.DB_URI || 'mongodb://127.0.0.1:27017/node-blog';
+const PORT = process.env.PORT || 4000;
 
-app.use(connectFlash());
+const mongoConnection = mongoose.connect(DB_URI);
+
 app.use(fileUpload());
 
-cloudinary.config({
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    cloud_name: process.env.CLOUDINARY_NAME
-});
-
-const mongoStore = connectMongo(expressSession);
-
-
+// cloudinary is optional, without it images are stored in public/posts
+if (process.env.CLOUDINARY_NAME) {
+    cloudinary.config({
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        cloud_name: process.env.CLOUDINARY_NAME
+    });
+}
 
 app.use(express.static('public')); // use helps us add functionality to express
 app.use(engine);
 app.use(expressSession(
     {
-        secret:process.env.EXPRESS_SESSION_KEY,
-        store: new mongoStore({
-            mongooseConnection: mongoose.connection
+        secret: process.env.EXPRESS_SESSION_KEY || 'dev-secret-change-me',
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({
+            clientPromise: mongoConnection.then(m => m.connection.getClient())
         })
     }
 ))
+app.use(connectFlash()); // flash needs the session, so it goes after it
 
 app.set('views', `${__dirname}/views`);
 
-app.use('*', (req,res, next) => {
+app.use((req,res, next) => {
     edge.global('auth',req.session.userId);
     next()
 })
 
-app.use(bodyParser.json()) 
+app.use(express.json())
 
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.urlencoded({extended: true}))
 
 
 
@@ -85,8 +87,8 @@ app.get('/post/:id',getPostController);
 app.get('/posts/new', auth, createPostController);
 
 app.post('/posts/store',auth, storePost, storePostController);
-app.use((req,res) => res.render('not-found'));
+app.use((req,res) => res.status(404).render('not-found'));
 
-app.listen(process.env.PORT,() => {
-    console.log(`listening on port ${process.env.PORT}`)
+app.listen(PORT,() => {
+    console.log(`listening on port ${PORT}`)
 })
