@@ -4,6 +4,18 @@ A multi-user recipe sharing site built with **Node.js, Express and MongoDB**. Vi
 
 I first built this in 2019 as a general blog, and in 2026 updated it to run on current Node.js and reworked it into a recipe site (details below).
 
+**Live demo:** https://recipe-box-6edx.onrender.com/ (hosted on Render's free tier, so the first load may take up to a minute while the server wakes up)
+
+## Screenshots
+
+![Home page](public/img/home1.png)
+
+![Recipe cards and search](public/img/home2.png)
+
+| Register | Login |
+| --- | --- |
+| ![Register page](public/img/register.png) | ![Login page](public/img/login.png) |
+
 ## Features
 
 - **User accounts**: registration and login, with passwords hashed using bcrypt
