@@ -3,14 +3,14 @@
 @section('content')
 
  <!-- Page Header -->
- <header class="masthead" style="background-image: url('img/home-bg.jpg')">
+ <header class="masthead">
     <div class="overlay"></div>
     <div class="container">
       <div class="row">
         <div class="col-lg-8 col-md-10 mx-auto">
           <div class="site-heading">
-            <h1>Blog</h1>
-            <span class="subheading">A Blog Theme</span>
+            <h1>Recipe Box</h1>
+            <span class="subheading">Home-cooked recipes, shared by home cooks</span>
           </div>
         </div>
       </div>
@@ -19,34 +19,58 @@
 
   <!-- Main Content -->
   <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-md-10 mx-auto">
-        @each(post in posts)
-        <div class="post-preview">
-        <a href="/post/{{ post._id }}">
-            <h2 class="post-title">
-              {{ post.title}}
-            </h2>
-            <h3 class="post-subtitle">
-                {{ post.subtitle}}
-              </h3>
-          </a>
-        <p class="post-meta"> Posted by 
-            <a href="#">{{ post.author.username }}</a>
-            on {{ post.createdAt.toDateString()}}</p>
-
-        </div>
-        <hr>
-        <br>
-        @endeach
-         
-        
-        <!-- Pager -->
-        <div class="clearfix">
-          <a class="btn btn-primary float-right" href="#">Older Posts &rarr;</a>
+    <form class="recipe-search" action="/" method="GET" role="search">
+      <div class="input-group">
+        <input type="search" name="q" value="{{ q }}" class="form-control" placeholder="Search recipes or ingredients, e.g. lentils" aria-label="Search recipes">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i> Search</button>
         </div>
       </div>
+    </form>
+
+    @if(q)
+    <p class="search-summary">
+      {{ recipes.length }} {{ recipes.length === 1 ? 'recipe' : 'recipes' }} matching "{{ q }}" &middot; <a href="/">Show all recipes</a>
+    </p>
+    @endif
+
+    @if(recipes.length > 0)
+    <div class="row">
+      @each(recipe in recipes)
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card recipe-card">
+          <a href="/recipes/{{ recipe._id }}">
+            <img class="card-img-top" src="{{ recipe.image }}" alt="{{ recipe.title }}">
+            <div class="card-body">
+              <h3 class="card-title">{{ recipe.title }}</h3>
+              <p class="card-text">{{ recipe.description }}</p>
+              <div class="recipe-meta">
+                @if(recipe.totalTime > 0)
+                <span><i class="far fa-clock"></i> {{ recipe.totalTime }} min</span>
+                @endif
+                @if(recipe.servings)
+                <span><i class="fas fa-utensils"></i> Serves {{ recipe.servings }}</span>
+                @endif
+                <span><i class="far fa-user"></i> {{ recipe.author.username }}</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+      @endeach
     </div>
+    @elseif(q)
+    <div class="empty-state">
+      <h2>No recipes found</h2>
+      <p>Try a different word, or <a href="/">browse all recipes</a>.</p>
+    </div>
+    @else
+    <div class="empty-state">
+      <h2>No recipes yet</h2>
+      <p>Be the first to share one.</p>
+      <a class="btn btn-primary" href="/recipes/new">Share a Recipe</a>
+    </div>
+    @endif
   </div>
 
   <hr>
